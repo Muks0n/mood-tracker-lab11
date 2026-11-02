@@ -9,8 +9,11 @@
 
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- Практична №10: підключення Vue 3 через CDN -->
+    <!-- Практична №10: підключення Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Практична №11: локальні сховища -->
+    <script src="js/storage.js" defer></script>
     <script src="js/app.js" defer></script>
 </head>
 
@@ -25,15 +28,12 @@
         </nav>
     </header>
 
-    <!-- Практична №10: кореневий елемент Vue -->
     <div id="app" class="page-layout" v-cloak>
         <main>
             <section id="mood-tracker">
                 <h2>Відмітити настрій</h2>
 
-                <!-- Vue обробляє надсилання форми -->
-                <form id="mood-form" @submit.prevent="addMoodRecord">
-
+                <form id="mood-form" @submit.prevent="saveMoodRecord">
                     <label for="date">Дата:</label>
                     <input
                         type="date"
@@ -43,7 +43,9 @@
                         required
                     >
 
-                    <label for="mood">Рівень настрою (1–5):</label>
+                    <label for="mood">
+                        Рівень настрою (1–5):
+                    </label>
                     <input
                         type="number"
                         id="mood"
@@ -65,27 +67,46 @@
                     >
 
                     <p id="note-counter">
-                        Залишилося символів: {{ 200 - newNote.length }}
+                        Залишилося символів:
+                        {{ 200 - newNote.length }}
                     </p>
 
-                    <button type="submit">Зберегти</button>
+                    <button type="submit" :disabled="!storageReady">
+                        {{ editingId === null ? 'Зберегти' : 'Оновити' }}
+                    </button>
+
+                    <button
+                        v-if="editingId !== null"
+                        type="button"
+                        @click="cancelEditing"
+                    >
+                        Скасувати
+                    </button>
                 </form>
+
+                <p
+                    class="storage-error"
+                    v-if="storageError"
+                    role="alert"
+                >
+                    {{ storageError }}
+                </p>
             </section>
 
             <section id="history">
                 <h2>Історія записів</h2>
 
                 <div class="cards" id="mood-history">
-
-                    <!-- Практична №10: компонент і цикл v-for -->
                     <mood-entry
                         v-for="record in moodRecords"
                         :key="record.id"
+                        :id="record.id"
                         :date="record.date"
                         :mood="record.mood"
                         :note="record.note"
+                        @edit="startEditing"
+                        @delete="removeMoodRecord"
                     ></mood-entry>
-
                 </div>
             </section>
 
@@ -118,7 +139,6 @@
                 </p>
 
                 <div class="cards" id="api-history">
-
                     <article
                         class="mood-card api-card"
                         v-for="record in apiRecords"
@@ -128,7 +148,6 @@
                         <p>{{ record.body }}</p>
                         <p>Email: {{ record.email }}</p>
                     </article>
-
                 </div>
             </section>
         </main>
@@ -143,7 +162,9 @@
             <p id="avg-mood" v-else>
                 Середній настрій:
                 {{ averageMood.toFixed(2) }} / 5.
-                {{ averageMood >= 3.5 ? 'Гарний тиждень!' : 'Важкий тиждень.' }}
+                {{ averageMood >= 3.5
+                    ? 'Гарний тиждень!'
+                    : 'Важкий тиждень.' }}
             </p>
         </aside>
     </div>
