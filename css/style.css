@@ -399,6 +399,55 @@ form input:invalid:not(:placeholder-shown)
     display: none !important;
 }
 
+/* Практична №11: робота з локальними сховищами */
+
+[v-cloak] {
+    display: none;
+}
+
+.record-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.record-actions button {
+    min-height: 40px;
+    padding: 8px 14px;
+
+    font-size: 0.875rem;
+    font-weight: bold;
+
+    color: #ffffff;
+    background-color: #66577a;
+
+    border: 2px solid #66577a;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.record-actions button:hover {
+    background-color: #514462;
+}
+
+form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.storage-error {
+    max-width: 1200px;
+    padding: 12px;
+
+    color: #842e2e;
+    background-color: #f8dada;
+
+    border: 2px solid #a04747;
+    border-radius: 8px;
+}
+
 /* Адаптація для планшетів */
 
 @media (min-width: 600px)
