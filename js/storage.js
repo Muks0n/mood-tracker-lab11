@@ -249,3 +249,4 @@ async function initializeStorage() {
 
     return getAllItems();
 }
+
