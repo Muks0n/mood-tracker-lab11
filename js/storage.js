@@ -9,7 +9,7 @@ const STORE_NAME = "moodEntries";
 const LOCAL_STORAGE_KEY = "moodEntries";
 const MIGRATION_KEY = "moodEntriesMigrated";
 
-// Крок 1. Модель даних.
+// Модель даних.
 const INITIAL_MOOD_RECORDS = [
     { id: 1, date: "2026-10-05", mood: 5, note: "Хороший день" },
     { id: 2, date: "2026-10-06", mood: 3, note: "Звичайний день" },
@@ -20,8 +20,9 @@ const INITIAL_MOOD_RECORDS = [
     { id: 7, date: "2026-10-11", mood: 1, note: "Жахливий день" }
 ];
 
-// Крок 2. Збереження масиву в localStorage.
-function saveToLocalStorage(items) {
+// Збереження масиву в localStorage.
+function saveToLocalStorage(items) 
+{
     localStorage.setItem(
         LOCAL_STORAGE_KEY,
         JSON.stringify(items)
@@ -29,37 +30,45 @@ function saveToLocalStorage(items) {
 }
 
 // Крок 2. Читання даних з обробкою помилок JSON.parse.
-function loadFromLocalStorage() {
-    try {
+function loadFromLocalStorage() 
+{
+    try 
+    {
         const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
 
-        if (raw === null) {
+        if (raw === null) 
+            {
             return [];
         }
 
         const items = JSON.parse(raw);
 
-        if (!Array.isArray(items)) {
+        if (!Array.isArray(items)) 
+            {
             throw new Error("Дані не є масивом");
         }
 
         return items;
-    } catch (error) {
+    } 
+    catch (error) 
+    {
         console.error("Помилка читання localStorage:", error);
         return [];
     }
 }
 
-// Кроки 5–6. Відкриття IndexedDB.
+// Відкриття IndexedDB.
 // onupgradeneeded створює сховище при першому запуску.
-function openDB() {
+function openDB() 
+{
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
 
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
+            if (!db.objectStoreNames.contains(STORE_NAME)) 
+            {
                 db.createObjectStore(STORE_NAME, {
                     keyPath: "id",
                     autoIncrement: true
@@ -72,7 +81,7 @@ function openDB() {
     });
 }
 
-// Крок 7. CREATE — додавання запису в IndexedDB.
+// CREATE — додавання запису в IndexedDB.
 async function addItem(item) {
     const db = await openDB();
 
@@ -116,7 +125,7 @@ async function addItem(item) {
     });
 }
 
-// Крок 7. READ — отримання всіх записів.
+// READ — отримання всіх записів.
 async function getAllItems() {
     const db = await openDB();
 
@@ -131,7 +140,7 @@ async function getAllItems() {
     });
 }
 
-// Крок 7. UPDATE — оновлення запису через put.
+// UPDATE — оновлення запису через put.
 async function updateItem(item) {
     const db = await openDB();
 
@@ -157,7 +166,7 @@ async function updateItem(item) {
     });
 }
 
-// Крок 7. DELETE — видалення запису за id.
+// DELETE — видалення запису за id.
 async function deleteItem(id) {
     const db = await openDB();
 
@@ -183,22 +192,25 @@ async function deleteItem(id) {
     });
 }
 
-// Крок 8. Одноразова міграція localStorage -> IndexedDB.
+// Одноразова міграція localStorage -> IndexedDB.
 async function migrateFromLocalStorage() {
-    if (localStorage.getItem(MIGRATION_KEY) === "true") {
+    if (localStorage.getItem(MIGRATION_KEY) === "true") 
+    {
         return;
     }
 
     const existingItems = await getAllItems();
 
     // Міграція виконується лише для порожнього сховища.
-    if (existingItems.length !== 0) {
+    if (existingItems.length !== 0) 
+    {
         return;
     }
 
     const localItems = loadFromLocalStorage();
 
-    if (localItems.length === 0) {
+    if (localItems.length === 0) 
+    {
         return;
     }
 
@@ -209,7 +221,8 @@ async function migrateFromLocalStorage() {
         const tx = db.transaction(STORE_NAME, "readwrite");
         const store = tx.objectStore(STORE_NAME);
 
-        for (const item of localItems) {
+        for (const item of localItems) 
+        {
             store.add(item);
         }
 
@@ -232,7 +245,7 @@ async function migrateFromLocalStorage() {
     localStorage.setItem(MIGRATION_KEY, "true");
 }
 
-// Крок 9. Ініціалізація сховища та отримання записів.
+// Ініціалізація сховища та отримання записів.
 async function initializeStorage() {
     const existingItems = await getAllItems();
 

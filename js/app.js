@@ -3,8 +3,10 @@
 // і компоненти та легко підключається через CDN.
 
 // Практична №11.
-// Для кроків 2–4 встановити "local".
-// Для кроків 5–12 встановити "indexed".
+// встановити "local".
+// або
+// встановити "indexed".
+
 const STORAGE_MODE = "indexed";
 
 const API_URL =
@@ -144,7 +146,7 @@ const app = Vue.createApp({
     },
 
     methods: {
-        // Кроки 3 і 9. Додавання або редагування запису.
+        // Додавання або редагування запису.
         async saveMoodRecord() {
             if (!this.storageReady) {
                 return;
@@ -157,7 +159,8 @@ const app = Vue.createApp({
                 !Number.isInteger(mood) ||
                 mood < 1 ||
                 mood > 5
-            ) {
+            ) 
+            {
                 return;
             }
 
@@ -170,9 +173,12 @@ const app = Vue.createApp({
             this.storageReady = false;
             this.storageError = "";
 
-            try {
-                if (STORAGE_MODE === "local") {
-                    if (this.editingId === null) {
+            try 
+            {
+                if (STORAGE_MODE === "local") 
+                    {
+                    if (this.editingId === null) 
+                    {
                         const maxId = Math.max(
                             0,
                             ...this.moodRecords.map(item => item.id)
@@ -180,43 +186,55 @@ const app = Vue.createApp({
 
                         record.id = maxId + 1;
                         this.moodRecords.push(record);
-                    } else {
+                    } 
+                    else 
+                    {
                         record.id = this.editingId;
 
                         const index = this.moodRecords.findIndex(
                             item => item.id === this.editingId
                         );
 
-                        if (index !== -1) {
+                        if (index !== -1) 
+                        {
                             this.moodRecords[index] = record;
                         }
                     }
 
-                    // Крок 3: збереження після зміни стану.
                     saveToLocalStorage(this.moodRecords);
-                } else {
-                    if (this.editingId === null) {
+                } 
+                else 
+                {
+                    if (this.editingId === null) 
+                    {
                         await addItem(record);
-                    } else {
+                    } 
+                    else 
+                    {
                         record.id = this.editingId;
                         await updateItem(record);
                     }
 
-                    // Крок 9: перечитування після CRUD.
+                    // перечитування після CRUD.
                     this.moodRecords = await getAllItems();
                 }
 
                 this.cancelEditing();
-            } catch (error) {
+            } 
+            catch (error) 
+            {
                 this.storageError =
                     "Не вдалося зберегти запис.";
 
                 console.error(error);
 
-                if (STORAGE_MODE === "local") {
+                if (STORAGE_MODE === "local") 
+                    {
                     this.moodRecords = loadFromLocalStorage();
                 }
-            } finally {
+            } 
+            finally 
+            {
                 this.storageReady = true;
             }
         },
@@ -247,68 +265,87 @@ const app = Vue.createApp({
             this.newNote = "";
         },
 
-        // Кроки 3 і 9. Видалення запису.
-        async removeMoodRecord(id) {
-            if (!this.storageReady) {
+        // Видалення запису.
+        async removeMoodRecord(id) 
+        {
+            if (!this.storageReady) 
+            {
                 return;
             }
 
             this.storageReady = false;
             this.storageError = "";
 
-            try {
-                if (STORAGE_MODE === "local") {
+            try 
+            {
+                if (STORAGE_MODE === "local") 
+                {
                     this.moodRecords = this.moodRecords.filter(
                         item => item.id !== id
                     );
 
                     saveToLocalStorage(this.moodRecords);
-                } else {
+                } 
+                else 
+                {
                     await deleteItem(id);
 
                     // Оновлення реактивного списку.
                     this.moodRecords = await getAllItems();
                 }
 
-                if (this.editingId === id) {
+                if (this.editingId === id) 
+                {
                     this.cancelEditing();
                 }
-            } catch (error) {
+            } 
+            catch (error) 
+            {
                 this.storageError =
                     "Не вдалося видалити запис.";
 
                 console.error(error);
 
-                if (STORAGE_MODE === "local") {
+                if (STORAGE_MODE === "local") 
+                {
                     this.moodRecords = loadFromLocalStorage();
                 }
-            } finally {
+            } 
+            finally 
+            {
                 this.storageReady = true;
             }
         },
 
-        // Кроки 4, 9, 11. Завантаження записів.
+        // Завантаження записів.
         async loadSavedMoodRecords() {
             this.storageReady = false;
             this.storageError = "";
 
-            try {
-                if (STORAGE_MODE === "local") {
+            try 
+            {
+                if (STORAGE_MODE === "local") 
+                {
                     const saved = localStorage.getItem(
                         LOCAL_STORAGE_KEY
                     );
 
-                    if (saved === null) {
+                    if (saved === null) 
+                    {
                         saveToLocalStorage(INITIAL_MOOD_RECORDS);
                     }
 
                     this.moodRecords = loadFromLocalStorage();
-                } else {
+                } 
+                else 
+                {
                     this.moodRecords = await initializeStorage();
                 }
 
                 this.storageReady = true;
-            } catch (error) {
+            } 
+            catch (error) 
+            {
                 this.storageError =
                     "Не вдалося відкрити сховище даних. " +
                     "Перевірте доступність IndexedDB у браузері.";

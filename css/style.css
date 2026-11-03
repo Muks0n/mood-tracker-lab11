@@ -448,6 +448,11 @@ form button:disabled {
     border-radius: 8px;
 }
 
+form button + button
+{
+    margin-left: 12px;
+}
+
 /* Адаптація для планшетів */
 
 @media (min-width: 600px)
